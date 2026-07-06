@@ -8,17 +8,18 @@ from dateutil import parser as date_parser
 
 import psycopg2
 
-from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, USER_AGENT, SCROLLS, MIN_AGE_HOURS, MIN_SCORE, WAIT_TIME_SECONDS, SUBREDDIT, HEADLESS
+from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, REMOTE_DRIVER_URL, USER_AGENT, SCROLLS, MIN_AGE_HOURS, MIN_SCORE, WAIT_TIME_SECONDS, SUBREDDIT, HEADLESS
 
 def parse():
     options = webdriver.FirefoxOptions()
     options.set_preference("dom.webdriver.enabled", False)
     options.set_preference("general.useragent.override", USER_AGENT)
 
-    if HEADLESS:
-        options.add_argument('--headless')
-
-    driver = webdriver.Firefox(options=options)
+    if REMOTE_DRIVER_URL:
+        driver = webdriver.Remote(command_executor=REMOTE_DRIVER_URL, options=options)
+    else:
+        driver = webdriver.Firefox(options=options)
+        if HEADLESS: options.add_argument('--headless')
 
     try:
         url = f'https://www.reddit.com/r/{SUBREDDIT}/'
